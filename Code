@@ -1,0 +1,40 @@
+from gpiozero import MotionSensor
+From RPLCD.12c import CharLCD
+from datetime import datetime
+from time import sleep
+import os
+pir = MotionSensor (17)
+print("ready")
+1cd = CharLCD(
+'PCF8574',
+0x27,
+cols=16,
+rows=2
+)
+lcd.clear()
+lcd.write_string("Security System")
+lcd.cursor_pos=(1,0)
+lcd.write_string("warming up")
+sleep(10)
+lcd.clear()
+lcd.cursor_pos=(1,0)
+lcd.write_string("Monitoring..")
+try:
+  while True:
+    pir.wait_for_motion()
+    lcd.clear()
+    lcd.write_string("INTRUDER
+    lcd.write_string("DETECTED!")
+    filename= "/home/pi/Desktop/"+ datetime.now().strftime( "intruder_%Y%m%d_%H%M%S.jpg" )
+    print("filename:", filename)
+    os.system(f"rpicam-still -o {filename} --nopreview -t 1")
+    print("image saved:", filename)
+    sleep(7)
+    lcd.clear()
+    lcd.write_string("Monitoring..")
+    pir.wait_for_no_motion()
+except KeyboardInterrupt:
+  lcd.clear()
+  lcd.write_string("System Off")
+  sleep(2)
+  lcd.clear()
